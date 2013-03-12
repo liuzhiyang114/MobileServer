@@ -1,0 +1,15 @@
+    前些时间，看到网上有人提问做一个远程监控的程序。当时我用UDP做了一个，但是出现诸多问题。归根结底，因为UDP的传输是没有保证的。于是，我就自己写了一个基于UDP的大数据传输程序。关于网络传输部分，我只用到DatagramSocket和DatagramPacket，自己实现检错机制。
+    大数据传输只是一个模块，我设计了两个类：SendLittle,ReceiveLittle。使用起来非常方便，先创建相应对象，调用其
+public void sendAll(byte littleBuffer[],int littleLength)
+public int receiveAll(byte littleBuffer[])
+即可。
+    ByteChange,CircleStack,MyRandom是几个工具类。
+    测试1：
+    TestSend和TestReceive是两个测试类，TestSend将当前目录中的screen.jpg传送给对方，TestReceive接收并存入Receive.jpg中。TestSend中的注释，从使用者的角度详细地讲述了如何使用SendLittle和ReceiveLittle.我在局域网中测试过较大的文件传输--两百兆的视频文件，有线传输在7、8M左右。不过，在互联网上传输，就慢很多了。
+    测试2：
+    SendImage和ReceiveImage。SendImage截屏并将图片以jpg的形式发送给接收方，ReceiveImage接收图片并显示。如果你需要修改IP和端口号的话，在代码中搜索并修改下面两句就行了。
+ReceiveLittle receiveLittle=new ReceiveLittle("localhost",10000,12000);
+SendLittle sendLittle = new SendLittle("localhost",12000,10000);
+最好是用两台电脑测试，一台电脑测试的话，会有有趣的现象。我在局域网中两台电脑传输，接收一张图片并显示，平均时间0.14秒.
+    最后说明一下，我的发送方和接收方都需要确定对方的IP，端口号和自己的端口号。接收方之所以要确定对方的IP和端口号，是因为检错机制是需要向发送方发送数据的。正规的作法是接收方动态的确定对方的IP和Port。但是我这里没这样作，嘿嘿，偷个懒。
+    最后说明一下，所有类都是在NetTransmit包中的。如果你不想放在这个包中，把代码中的package语句去掉。
