@@ -14,7 +14,7 @@ import com.smartlab.mobileserver.tool.IniReader;
 public class Mobileserver {
 	
 	/**
-	 * @param args
+	 * @param 王珏辉
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
