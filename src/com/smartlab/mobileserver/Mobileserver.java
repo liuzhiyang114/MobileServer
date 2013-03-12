@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import com.smartlab.mobileserver.entity.ServerForDB;
 import com.smartlab.mobileserver.entity.ServerForData;
+import com.smartlab.mobileserver.entity.ServerForMobile;
 import com.smartlab.mobileserver.entity.SyncQueue;
 import com.smartlab.mobileserver.thread.HandleMobileThread;
 import com.smartlab.mobileserver.thread.ReadDBServiceThread;
@@ -48,8 +49,11 @@ public class Mobileserver {
 		ServerForDB serverForDB=new ServerForDB(dataServerAdress,dport);
 		serverForDB.ConnectToDBServer();
 		
+		//4 创建一个专门处理Mobile端的对象实例，让它与手机端建立起Tcp连接并发送数据(ServerForMobile类)
+		ServerForMobile serverForMobile=new ServerForMobile();
+		
 		//4 创建一个数据处理中心对象:能根据从DBServer返回的字符串做相应的处理(ServerForData类)
-		ServerForData serverForData=new ServerForData();
+		ServerForData serverForData=new ServerForData(serverForMobile);
 		
 		//5 新建一个读取从DBServer返回的数据线程(ReadDBServiceThread类)，读到数据后交予数据处理中心对象处理
 		ReadDBServiceThread readDBServiceThread=new ReadDBServiceThread(serverForDB,serverForData);
