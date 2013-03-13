@@ -60,7 +60,7 @@ public class Mobileserver {
 		readDBServiceThread.start();
 		
 		//6 开启请求任务扫描线程（扫描请求缓冲池，并利用DBServer服务对象发送）
-		TaskScannerThread taskScannerThread=new TaskScannerThread(syncQueue,serverForDB);
+		TaskScannerThread taskScannerThread=new TaskScannerThread(syncQueue,serverForDB,serverForMobile);
 		taskScannerThread.start();
 		
 		//7 开启发送心跳线程（发送心跳数据到请求缓冲池）
