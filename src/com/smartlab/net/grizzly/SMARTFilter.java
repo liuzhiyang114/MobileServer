@@ -109,7 +109,7 @@ public class SMARTFilter extends BaseFilter{
         final SMARTMessage smartMessage = ctx.getMessage();
 
         final int size = HEADER_SIZE + smartMessage.getBodyLength();
-
+        
         // Retrieve the memory manager
         final MemoryManager memoryManager =
                 ctx.getConnection().getTransport().getMemoryManager();
