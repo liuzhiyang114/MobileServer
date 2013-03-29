@@ -78,13 +78,14 @@ public class MobileServer {
 	        
 	        try {
 	            // binding transport to start listen on certain host and port
-	            transport.bind("127.0.0.1", 7777);
+	            transport.bind("10.84.199.239", 7777);
 
 	            // start the transport
 	            transport.start();
 
 	            logger.info("Press any key to stop the MobileServer...");
 	            System.in.read();
+	            //System.out.println(ms);
 	        } catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -158,7 +159,7 @@ class ConnectToDBServer extends Thread{
             transport.start();
 
             // perform async. connect to the server
-            Future<Connection> future = transport.connect("127.0.0.1",
+            Future<Connection> future = transport.connect("10.84.199.239",
                     7776);
             // wait for connect operation to complete
             _connection = future.get(10, TimeUnit.SECONDS);

@@ -43,7 +43,7 @@ class MobileClient {
 	}
 
 	public String write(String msg) {
-		String back = MobileClientService.WriteMsgToMSForCallBack("127.0.0.1",
+		String back = MobileClientService.WriteMsgToMSForCallBack("10.84.199.239",
 				7777, msg);
 
 //		System.out.println("client" + _i + " rev:" + back);

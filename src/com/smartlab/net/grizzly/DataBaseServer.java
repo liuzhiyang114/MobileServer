@@ -17,7 +17,6 @@ public class DataBaseServer {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		
 		// Create a FilterChain using FilterChainBuilder
         FilterChainBuilder filterChainBuilder = FilterChainBuilder.stateless();
@@ -27,7 +26,7 @@ public class DataBaseServer {
         filterChainBuilder.add(new TransportFilter());
 
         // StringFilter is responsible for Buffer <-> String conversion
-//        filterChainBuilder.add(new StringFilter(Charset.forName("UTF-8")));
+        //filterChainBuilder.add(new StringFilter(Charset.forName("UTF-8")));
         filterChainBuilder.add(new SMARTFilter());
 
         // EchoFilter is responsible for echoing received messages
@@ -41,7 +40,7 @@ public class DataBaseServer {
 
         try {
             // binding transport to start listen on certain host and port
-            transport.bind("127.0.0.1", 7776);
+            transport.bind("10.84.199.239", 7776);
 
             // start the transport
             transport.start();
