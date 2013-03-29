@@ -40,7 +40,7 @@ public class DataBaseServer {
 
         try {
             // binding transport to start listen on certain host and port
-            transport.bind("10.84.199.239", 7776);
+            transport.bind("10.84.199.239", 7776);// IP为实验室的局域网IP
 
             // start the transport
             transport.start();
