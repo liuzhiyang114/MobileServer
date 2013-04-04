@@ -38,67 +38,127 @@ public class CToJavaMessageFilter extends BaseFilter {
 			// used next time
 			return ctx.getStopAction(sourceBuffer);
 		}
+		
+		while(sourceBuffer.hasRemaining()){
+			if(sourceBuffer.get()=='Z'){
+				if(sourceBuffer.get()=='I'){
+					if(sourceBuffer.get()=='G'){
+						int bodyLength=sourceBuffer.getInt();
+						System.out.println("bodyLength:"+bodyLength);
+						
+						if(bodyLength<=0||bodyLength>=10){
+							System.out.println("bad bodylength!");
+							return ctx.getStopAction();
+						}
+						
+						// The complete message length
+						final int completeMessageLength = HEADER_SIZE + bodyLength;
 
-		int position=sourceBuffer.position();//0开始
+						// If the source message doesn't contain entire body
+						if (sourceBufferLength < completeMessageLength) {
+							// stop the filterchain processing and store sourceBuffer to be
+							// used next time
+							int oldposition=sourceBuffer.position()-7;
+							System.out.println("此条数据不完整，等待完整数据！");
+							return ctx.getStopAction(sourceBuffer.position(oldposition));
+						}
+
+						// Check if the source buffer has more than 1 complete GIOP message
+						// If yes - split up the first message and the remainder
+						final Buffer remainder = sourceBufferLength > completeMessageLength ? sourceBuffer
+								.split(completeMessageLength) : null;
+
+						// Construct a CToJavaMessage message
+						final CToJavaMessage cToJavaMessage = new CToJavaMessage();
+
+						// Set GIOP header bytes
+						cToJavaMessage.setCToJavaMessageHeader((byte)'Z',
+								(byte)'I', (byte)'G');
+
+						// Set body length
+						cToJavaMessage.setBodyLength(bodyLength);
+
+						// Read body
+						final byte[] body = new byte[bodyLength];
+						
+						sourceBuffer.get(body);
+						// Set body
+						cToJavaMessage.setBody(body);
+
+						ctx.setMessage(cToJavaMessage);
+
+						// We can try to dispose the buffer
+						sourceBuffer.tryDispose();
+						// execution
+						return ctx.getInvokeAction(remainder);
+					}
+				}
+			}
+			
+		}
+		
+		return ctx.getStopAction();
+
+
 		
 		// Get the body length
-		int bodyLength = sourceBuffer.getInt(HEADER_SIZE - 4);
-		byte bodyLength1=sourceBuffer.get(HEADER_SIZE - 4);
-		byte bodyLength2=sourceBuffer.get(HEADER_SIZE - 3);
-		byte bodyLength3=sourceBuffer.get(HEADER_SIZE - 2);
-		byte bodyLength4=sourceBuffer.get(HEADER_SIZE - 1);
-		byte[] bb=new byte[4];
-		bb[0]=bodyLength1;bb[1]=bodyLength2;bb[2]=bodyLength3;bb[3]=bodyLength4;
-		System.out.println("转换的整形："+byteArrayToInt(bb,0));
-
-		System.out.println("sourceBufferLength:"+sourceBufferLength);
-		System.out.println("bodyLength:"+bodyLength);
+//		int bodyLength = sourceBuffer.getInt(HEADER_SIZE - 4);
+//		byte bodyLength1=sourceBuffer.get(HEADER_SIZE - 4);
+//		byte bodyLength2=sourceBuffer.get(HEADER_SIZE - 3);
+//		byte bodyLength3=sourceBuffer.get(HEADER_SIZE - 2);
+//		byte bodyLength4=sourceBuffer.get(HEADER_SIZE - 1);
+//		byte[] bb=new byte[4];
+//		bb[0]=bodyLength1;bb[1]=bodyLength2;bb[2]=bodyLength3;bb[3]=bodyLength4;
+//		System.out.println("转换的整形："+byteArrayToInt(bb,0));
+//
+//		System.out.println("sourceBufferLength:"+sourceBufferLength);
+//		System.out.println("bodyLength:"+bodyLength);
+//		
+//		if(bodyLength<=0||bodyLength>=10){
+//			System.out.println("bad bodylength!");
+//			return ctx.getStopAction();
+//		}
 		
-		if(bodyLength<=0||bodyLength>=10){
-			System.out.println("bad bodylength!");
-			return ctx.getStopAction();
-		}
-		
-		// The complete message length
-		final int completeMessageLength = HEADER_SIZE + bodyLength;
-
-		// If the source message doesn't contain entire body
-		if (sourceBufferLength < completeMessageLength) {
-			// stop the filterchain processing and store sourceBuffer to be
-			// used next time
-			return ctx.getStopAction(sourceBuffer);
-		}
-
-		// Check if the source buffer has more than 1 complete GIOP message
-		// If yes - split up the first message and the remainder
-		final Buffer remainder = sourceBufferLength > completeMessageLength ? sourceBuffer
-				.split(completeMessageLength) : null;
-
-		// Construct a CToJavaMessage message
-		final CToJavaMessage cToJavaMessage = new CToJavaMessage();
-
-		// Set GIOP header bytes
-		cToJavaMessage.setCToJavaMessageHeader(sourceBuffer.get(),
-				sourceBuffer.get(), sourceBuffer.get());
-
-		// Set body length
-		cToJavaMessage.setBodyLength(sourceBuffer.getInt());
-
-		// Read body
-		final byte[] body = new byte[bodyLength];
-		
-		sourceBuffer.get(body);
-		// Set body
-		cToJavaMessage.setBody(body);
-
-		ctx.setMessage(cToJavaMessage);
-
-		// We can try to dispose the buffer
-		sourceBuffer.tryDispose();
+//		// The complete message length
+//		final int completeMessageLength = HEADER_SIZE + bodyLength;
+//
+//		// If the source message doesn't contain entire body
+//		if (sourceBufferLength < completeMessageLength) {
+//			// stop the filterchain processing and store sourceBuffer to be
+//			// used next time
+//			return ctx.getStopAction(sourceBuffer);
+//		}
+//
+//		// Check if the source buffer has more than 1 complete GIOP message
+//		// If yes - split up the first message and the remainder
+//		final Buffer remainder = sourceBufferLength > completeMessageLength ? sourceBuffer
+//				.split(completeMessageLength) : null;
+//
+//		// Construct a CToJavaMessage message
+//		final CToJavaMessage cToJavaMessage = new CToJavaMessage();
+//
+//		// Set GIOP header bytes
+//		cToJavaMessage.setCToJavaMessageHeader(sourceBuffer.get(),
+//				sourceBuffer.get(), sourceBuffer.get());
+//
+//		// Set body length
+//		cToJavaMessage.setBodyLength(sourceBuffer.getInt());
+//
+//		// Read body
+//		final byte[] body = new byte[bodyLength];
+//		
+//		sourceBuffer.get(body);
+//		// Set body
+//		cToJavaMessage.setBody(body);
+//
+//		ctx.setMessage(cToJavaMessage);
+//
+//		// We can try to dispose the buffer
+//		sourceBuffer.tryDispose();
 
 		// Instruct FilterChain to store the remainder (if any) and continue
-		// execution
-		return ctx.getInvokeAction(remainder);
+//		// execution
+//		return ctx.getInvokeAction(remainder);
 	}
 
 	/**
