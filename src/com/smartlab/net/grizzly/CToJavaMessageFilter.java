@@ -8,116 +8,123 @@ import org.glassfish.grizzly.filterchain.FilterChainContext;
 import org.glassfish.grizzly.filterchain.NextAction;
 import org.glassfish.grizzly.memory.MemoryManager;
 
-public class CToJavaMessageFilter extends BaseFilter{
-	
+public class CToJavaMessageFilter extends BaseFilter {
+
 	private static final int HEADER_SIZE = 7;
-	
-	 /**
-     * Method is called, when new data was read from the Connection and ready
-     * to be processed.
-     *
-     * We override this method to perform Buffer -> GIOPMessage transformation.
-     * 
-     * @param ctx Context of {@link FilterChainContext} processing
-     * @return the next action
-     * @throws java.io.IOException
-     */
-    @Override
-    public NextAction handleRead(final FilterChainContext ctx) throws IOException {
-        // Get the source buffer from the context
-        final Buffer sourceBuffer = ctx.getMessage();
 
-        final int sourceBufferLength = sourceBuffer.remaining();
+	/**
+	 * Method is called, when new data was read from the Connection and ready to
+	 * be processed.
+	 * 
+	 * We override this method to perform Buffer -> GIOPMessage transformation.
+	 * 
+	 * @param ctx
+	 *            Context of {@link FilterChainContext} processing
+	 * @return the next action
+	 * @throws java.io.IOException
+	 */
+	@Override
+	public NextAction handleRead(final FilterChainContext ctx)
+			throws IOException {
+		// Get the source buffer from the context
+		final Buffer sourceBuffer = ctx.getMessage();
 
-        // If source buffer doesn't contain header
-        if (sourceBufferLength < HEADER_SIZE) {
-            // stop the filterchain processing and store sourceBuffer to be
-            // used next time
-            return ctx.getStopAction(sourceBuffer);
-        }
+		final int sourceBufferLength = sourceBuffer.remaining();
 
-        // Get the body length
-        final int bodyLength = sourceBuffer.getInt(HEADER_SIZE - 4);
-        // The complete message length
-        final int completeMessageLength = HEADER_SIZE + bodyLength;
-        
-        // If the source message doesn't contain entire body
-        if (sourceBufferLength < completeMessageLength) {
-            // stop the filterchain processing and store sourceBuffer to be
-            // used next time
-            return ctx.getStopAction(sourceBuffer);
-        }
+		// If source buffer doesn't contain header
+		if (sourceBufferLength < HEADER_SIZE) {
+			// stop the filterchain processing and store sourceBuffer to be
+			// used next time
+			return ctx.getStopAction(sourceBuffer);
+		}
 
-        // Check if the source buffer has more than 1 complete GIOP message
-        // If yes - split up the first message and the remainder
-        final Buffer remainder = sourceBufferLength > completeMessageLength ? 
-            sourceBuffer.split(completeMessageLength) : null;
+		// Get the body length
+		final int bodyLength = sourceBuffer.getInt(HEADER_SIZE - 4);
+		// The complete message length
+		final int completeMessageLength = HEADER_SIZE + bodyLength;
 
-        // Construct a SMART message
-        final CToJavaMessage cToJavaMessage = new CToJavaMessage();
+		// If the source message doesn't contain entire body
+		if (sourceBufferLength < completeMessageLength) {
+			// stop the filterchain processing and store sourceBuffer to be
+			// used next time
+			return ctx.getStopAction(sourceBuffer);
+		}
 
-        // Set GIOP header bytes
-        cToJavaMessage.setCToJavaMessageHeader(sourceBuffer.get(), sourceBuffer.get(),
-                sourceBuffer.get());
+		// Check if the source buffer has more than 1 complete GIOP message
+		// If yes - split up the first message and the remainder
+		final Buffer remainder = sourceBufferLength > completeMessageLength ? sourceBuffer
+				.split(completeMessageLength) : null;
 
-        // Set body length
-        cToJavaMessage.setBodyLength(sourceBuffer.getInt());
-        
-        // Read body
-        final byte[] body = new byte[bodyLength];
-        sourceBuffer.get(body);
-        // Set body
-        cToJavaMessage.setBody(body);
+		// Construct a CToJavaMessage message
+		final CToJavaMessage cToJavaMessage = new CToJavaMessage();
 
-        ctx.setMessage(cToJavaMessage);
+		// Set GIOP header bytes
+		cToJavaMessage.setCToJavaMessageHeader(sourceBuffer.get(),
+				sourceBuffer.get(), sourceBuffer.get());
 
-        // We can try to dispose the buffer
-        sourceBuffer.tryDispose();
+		// Set body length
+		cToJavaMessage.setBodyLength(sourceBuffer.getInt());
 
-        // Instruct FilterChain to store the remainder (if any) and continue execution
-        return ctx.getInvokeAction(remainder);
-    }
+		// Read body
+		final byte[] body = new byte[bodyLength];
+		sourceBuffer.get(body);
+		// Set body
+		cToJavaMessage.setBody(body);
 
-    /**
-     * Method is called, when we write a data to the Connection.
-     *
-     * We override this method to perform GIOPMessage -> Buffer transformation.
-     *
-     * @param ctx Context of {@link FilterChainContext} processing
-     * @return the next action
-     * @throws java.io.IOException
-     */
-    @Override
-    public NextAction handleWrite(final FilterChainContext ctx) throws IOException {
-        // Get the source SMART message to be written
-        final CToJavaMessage cToJavaMessage = ctx.getMessage();
+		ctx.setMessage(cToJavaMessage);
 
-        final int size = HEADER_SIZE + cToJavaMessage.getBodyLength();
-        
-        // Retrieve the memory manager
-        final MemoryManager memoryManager =
-                ctx.getConnection().getTransport().getMemoryManager();
+		// We can try to dispose the buffer
+		sourceBuffer.tryDispose();
 
-        // allocate the buffer of required size
-        final Buffer output = memoryManager.allocate(size);
+		// Instruct FilterChain to store the remainder (if any) and continue
+		// execution
+		return ctx.getInvokeAction(remainder);
+	}
 
-        // Allow Grizzly core to dispose the buffer, once it's written
-        output.allowBufferDispose(true);
-        
-        // cToJavaMessage header
-        output.put(cToJavaMessage.getCToJavaMessageHeader());
+	/**
+	 * Method is called, when we write a data to the Connection.
+	 * 
+	 * We override this method to perform GIOPMessage -> Buffer transformation.
+	 * 
+	 * @param ctx
+	 *            Context of {@link FilterChainContext} processing
+	 * @return the next action
+	 * @throws java.io.IOException
+	 */
+	@Override
+	public NextAction handleWrite(final FilterChainContext ctx)
+			throws IOException {
+		// Get the source SMART message to be written
+		final CToJavaMessage cToJavaMessage = ctx.getMessage();
 
-        // Body length
-        output.putInt(cToJavaMessage.getBodyLength());
+		final int size = HEADER_SIZE + cToJavaMessage.getBodyLength();
 
-        // Body
-        output.put(cToJavaMessage.getBody());
+		// Retrieve the memory manager
+		final MemoryManager memoryManager = ctx.getConnection().getTransport()
+				.getMemoryManager();
 
-        // Set the Buffer as a context message
-        ctx.setMessage(output.flip());
+		// allocate the buffer of required size
+		final Buffer output = memoryManager.allocate(size);
 
-        // Instruct the FilterChain to call the next filter
-        return ctx.getInvokeAction();
-    }
+		// Allow Grizzly core to dispose the buffer, once it's written
+		output.allowBufferDispose(true);
+
+		// cToJavaMessage header
+		output.put(cToJavaMessage.getCToJavaMessageHeader());
+
+		// Body length
+		output.putInt(cToJavaMessage.getBodyLength());
+
+		// Body
+		output.put(cToJavaMessage.getBody());
+
+		// Set the Buffer as a context message
+		ctx.setMessage(output.flip());
+
+		// Instruct the FilterChain to call the next filter
+		return ctx.getInvokeAction();
+	}
+
+
 
 }

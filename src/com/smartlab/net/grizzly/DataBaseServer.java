@@ -96,6 +96,7 @@ class ServerForZigBee extends Thread{
 		// for reading and writing data to the connection
 		filterChainBuilder.add(new TransportFilter());
 
+//		filterChainBuilder.add(new CharFilter());
 		// StringFilter is responsible for Buffer <-> String conversion
 //	        filterChainBuilder.add(new StringFilter(Charset.forName("UTF-8")));
 		filterChainBuilder.add(new CToJavaMessageFilter());
