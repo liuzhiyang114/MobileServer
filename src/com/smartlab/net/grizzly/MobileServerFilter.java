@@ -81,11 +81,11 @@ public class MobileServerFilter extends BaseFilter {
 						SMARTMessage rcvMessage = resultMessageFuture.get(5,
 								TimeUnit.SECONDS);
 
-						System.out.println("MS to MB(pro1):{ÎÒÊÇÊÖ»ú·þÎñÆ÷"
+						System.out.println("MS to MB(pro1):{ï¿½ï¿½ï¿½ï¿½ï¿½Ö»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
 								+ new String(rcvMessage.getBody(), "UTF-8"));
 
 						// test
-						String newBody2 = "MStoMB:{ÎÒÊÇÊÖ»ú·þÎñÆ÷"
+						String newBody2 = "MStoMB:{ï¿½ï¿½ï¿½ï¿½ï¿½Ö»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
 								+ new String(rcvMessage.getBody(), "UTF-8")
 								+ "}";
 						byte[] newBytes2 = newBody2.getBytes("UTF-8");
@@ -125,5 +125,13 @@ public class MobileServerFilter extends BaseFilter {
 
 		return ctx.getStopAction();
 	}
+
+	@Override
+	public NextAction handleClose(FilterChainContext ctx) throws IOException {
+		// TODO Auto-generated method stub
+		
+		return super.handleClose(ctx);
+	}
+	
 
 }

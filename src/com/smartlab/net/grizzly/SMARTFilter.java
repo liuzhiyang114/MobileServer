@@ -83,7 +83,10 @@ public class SMARTFilter extends BaseFilter{
         final byte[] body = new byte[bodyLength];
         sourceBuffer.get(body);
         // Set body
-        smartMessage.setBody(body);
+        if(body!=null){
+        	smartMessage.setBody(body);
+        }
+        
 
         ctx.setMessage(smartMessage);
 
@@ -142,8 +145,10 @@ public class SMARTFilter extends BaseFilter{
         output.putLong(smartMessage.getTaskId());
         
         // Body
-        output.put(smartMessage.getBody());
-
+        if(smartMessage.getBody()!=null){
+        	output.put(smartMessage.getBody());
+        }
+        
         // Set the Buffer as a context message
         ctx.setMessage(output.flip());
 

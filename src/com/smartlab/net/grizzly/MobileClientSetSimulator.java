@@ -4,7 +4,7 @@ public class MobileClientSetSimulator {
 
 	public static void main(String[] args) {
 
-		for (int i = 0; i < 400; i++) {
+		for (int i = 0; i < 4; i++) {
 			final int ii = i;
 			new Thread() {
 				public void run() {
@@ -43,7 +43,7 @@ class MobileClient {
 	}
 
 	public String write(String msg) {
-		String back = MobileClientService.WriteMsgToMSForCallBack("10.84.199.239",
+		String back = MobileClientService.WriteMsgToMSForCallBack("localhost",
 				7777, msg);
 
 //		System.out.println("client" + _i + " rev:" + back);

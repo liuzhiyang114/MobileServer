@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
@@ -78,7 +81,7 @@ public class MobileServer {
 	        
 	        try {
 	            // binding transport to start listen on certain host and port
-	            transport.bind("10.84.199.239", 7777);
+	            transport.bind("localhost", 7777);
 
 	            // start the transport
 	            transport.start();
@@ -159,7 +162,7 @@ class ConnectToDBServer extends Thread{
             transport.start();
 
             // perform async. connect to the server
-            Future<Connection> future = transport.connect("10.84.199.239",
+            Future<Connection> future = transport.connect("localhost",
                     7776);
             // wait for connect operation to complete
             _connection = future.get(10, TimeUnit.SECONDS);
@@ -200,6 +203,16 @@ class ConnectToDBServer extends Thread{
 }
 class ServerForDBFilter extends BaseFilter{
 	MobileServer _ms=null;
+	private ScheduledExecutorService scheduler = Executors
+			.newScheduledThreadPool(2, new ThreadFactory() {
+
+				@Override
+				public Thread newThread(Runnable r) {
+					final Thread thread = new Thread(r);
+					thread.setDaemon(true);
+					return thread;
+				}
+			});
 	
 	public ServerForDBFilter(MobileServer ms){
 		_ms=ms;
@@ -226,6 +239,39 @@ class ServerForDBFilter extends BaseFilter{
 		
         return ctx.getStopAction();
 	}
+
+	@Override
+	public void exceptionOccurred(FilterChainContext ctx, Throwable error) {
+		// TODO Auto-generated method stub
+		super.exceptionOccurred(ctx, error);
+		System.out.println("exceptionOccurred");
+	}
+
+	@Override
+	public NextAction handleClose(final FilterChainContext ctx) throws IOException {
+		// TODO Auto-generated method stub
+		
+		System.out.println("handleClose");
+//		scheduler.schedule(new Runnable() {
+//
+//			@Override
+//			public void run() {
+//				// TODO Auto-generated method stub
+//				try {
+//					ctx.getConnection().getTransport().stop();
+//					ctx.getConnection().getTransport().start();
+//				} catch (IOException e) {
+//					// TODO Auto-generated catch block
+//					e.printStackTrace();
+//				}
+//				
+//			}
+//			
+//		}, 10, TimeUnit.MILLISECONDS);
+		return super.handleClose(ctx);
+	}
+	
+	
 	
 	
 	
