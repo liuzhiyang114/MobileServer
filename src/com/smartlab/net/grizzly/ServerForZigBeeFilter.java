@@ -16,7 +16,7 @@ public class ServerForZigBeeFilter extends BaseFilter{
 		if (message != null) {
 			byte[] body=message.getBody();
 			
-			System.out.println(toHex(body));
+			System.out.println("rev:"+toHex(body));
 			
 		}
 		

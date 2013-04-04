@@ -29,6 +29,7 @@ public class CToJavaMessageFilter extends BaseFilter {
 		// Get the source buffer from the context
 		final Buffer sourceBuffer = ctx.getMessage();
 
+//		System.out.println("sourceBuffer:"+sourceBuffer.array());
 		final int sourceBufferLength = sourceBuffer.remaining();
 
 		// If source buffer doesn't contain header
@@ -38,8 +39,26 @@ public class CToJavaMessageFilter extends BaseFilter {
 			return ctx.getStopAction(sourceBuffer);
 		}
 
+		int position=sourceBuffer.position();//0开始
+		
 		// Get the body length
-		final int bodyLength = sourceBuffer.getInt(HEADER_SIZE - 4);
+		int bodyLength = sourceBuffer.getInt(HEADER_SIZE - 4);
+		byte bodyLength1=sourceBuffer.get(HEADER_SIZE - 4);
+		byte bodyLength2=sourceBuffer.get(HEADER_SIZE - 3);
+		byte bodyLength3=sourceBuffer.get(HEADER_SIZE - 2);
+		byte bodyLength4=sourceBuffer.get(HEADER_SIZE - 1);
+		byte[] bb=new byte[4];
+		bb[0]=bodyLength1;bb[1]=bodyLength2;bb[2]=bodyLength3;bb[3]=bodyLength4;
+		System.out.println("转换的整形："+byteArrayToInt(bb,0));
+
+		System.out.println("sourceBufferLength:"+sourceBufferLength);
+		System.out.println("bodyLength:"+bodyLength);
+		
+		if(bodyLength<=0||bodyLength>=10){
+			System.out.println("bad bodylength!");
+			return ctx.getStopAction();
+		}
+		
 		// The complete message length
 		final int completeMessageLength = HEADER_SIZE + bodyLength;
 
@@ -67,6 +86,7 @@ public class CToJavaMessageFilter extends BaseFilter {
 
 		// Read body
 		final byte[] body = new byte[bodyLength];
+		
 		sourceBuffer.get(body);
 		// Set body
 		cToJavaMessage.setBody(body);
@@ -125,6 +145,14 @@ public class CToJavaMessageFilter extends BaseFilter {
 		return ctx.getInvokeAction();
 	}
 
+	public  int byteArrayToInt(byte[] b, int offset) {
+	       int value= 0;
+	       for (int i = 0; i < 4; i++) {
+	           int shift= (4 - 1 - i) * 8;
+	           value +=(b[i + offset] & 0x000000FF) << shift;//往高位游
+	       }
+	       return value;
+	 }
 
 
 }
