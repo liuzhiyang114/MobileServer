@@ -38,7 +38,7 @@ public class CToJavaMessageFilter extends BaseFilter {
 			// used next time
 			return ctx.getStopAction(sourceBuffer);
 		}
-		
+		try{
 		while(sourceBuffer.hasRemaining()){
 			if(sourceBuffer.get()=='Z'){
 				if(sourceBuffer.get()=='I'){
@@ -95,6 +95,9 @@ public class CToJavaMessageFilter extends BaseFilter {
 				}
 			}
 			
+		}
+		}catch(Exception e){
+			e.printStackTrace();
 		}
 		
 		return ctx.getStopAction();
