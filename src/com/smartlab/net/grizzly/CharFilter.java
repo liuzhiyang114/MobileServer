@@ -14,20 +14,25 @@ public class CharFilter extends BaseFilter {
 	public NextAction handleRead(FilterChainContext ctx) throws IOException {
 		// TODO Auto-generated method stub
 		Buffer sourceBuffer = ctx.getMessage();
-		byte[] arr = sourceBuffer.array();
-		byte[] signarr = ToSignCharArray(arr);
+		if(sourceBuffer.hasArray()){
+//			byte[] arr = sourceBuffer.array();
+//			byte[] signarr = ToSignCharArray(arr);
+//			
+//			// Retrieve the memory manager
+//			final MemoryManager memoryManager = ctx.getConnection().getTransport()
+//					.getMemoryManager();
+//
+//			// allocate the buffer of required size
+//			final Buffer output = memoryManager.allocate(signarr.length);
+//			output.put(signarr);
+//			// Set the Buffer as a context message
+//			ctx.setMessage(output);
+//			
+//			sourceBuffer.dispose();
+			byte[] arr = sourceBuffer.array();
+			arr=ToSignCharArray(arr);
+		}
 		
-		// Retrieve the memory manager
-		final MemoryManager memoryManager = ctx.getConnection().getTransport()
-				.getMemoryManager();
-
-		// allocate the buffer of required size
-		final Buffer output = memoryManager.allocate(signarr.length);
-		output.put(signarr);
-		// Set the Buffer as a context message
-		ctx.setMessage(output);
-		
-		sourceBuffer.dispose();
 		return ctx.getInvokeAction();
 	}
 	
