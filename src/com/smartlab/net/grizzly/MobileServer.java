@@ -204,7 +204,7 @@ class ConnectToDBServer extends Thread{
 class ServerForDBFilter extends BaseFilter{
 	MobileServer _ms=null;
 	private ScheduledExecutorService scheduler = Executors
-			.newScheduledThreadPool(2, new ThreadFactory() {
+			.newScheduledThreadPool(5, new ThreadFactory() {
 
 				@Override
 				public Thread newThread(Runnable r) {
@@ -256,18 +256,12 @@ class ServerForDBFilter extends BaseFilter{
 //
 //			@Override
 //			public void run() {
-//				// TODO Auto-generated method stub
-//				try {
-//					ctx.getConnection().getTransport().stop();
-//					ctx.getConnection().getTransport().start();
-//				} catch (IOException e) {
-//					// TODO Auto-generated catch block
-//					e.printStackTrace();
-//				}
+//				(TCPNIOTransport)(ctx.getConnection().getTransport());
 //				
 //			}
 //			
 //		}, 10, TimeUnit.MILLISECONDS);
+		System.in.close();
 		return super.handleClose(ctx);
 	}
 	

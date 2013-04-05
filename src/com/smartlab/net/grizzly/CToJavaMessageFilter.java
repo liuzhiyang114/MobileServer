@@ -32,6 +32,8 @@ public class CToJavaMessageFilter extends BaseFilter {
 //		System.out.println("sourceBuffer:"+sourceBuffer.array());
 		final int sourceBufferLength = sourceBuffer.remaining();
 
+		System.out.println("sourceBufferLength:"+sourceBufferLength);
+		
 		// If source buffer doesn't contain header
 		if (sourceBufferLength < HEADER_SIZE) {
 			// stop the filterchain processing and store sourceBuffer to be
@@ -43,19 +45,23 @@ public class CToJavaMessageFilter extends BaseFilter {
 			if(sourceBuffer.get()=='Z'){
 				if(sourceBuffer.get()=='I'){
 					if(sourceBuffer.get()=='G'){
-						int bodyLength=sourceBuffer.getInt();
-						System.out.println("bodyLength:"+bodyLength);
+						int realsourceBufferLength = sourceBuffer.remaining();//少3个头部字节
 						
-						if(bodyLength<=0||bodyLength>=10){
+						int bodyLength=sourceBuffer.getInt();
+						
+						System.out.println("bodyLength:"+bodyLength);
+						System.out.println("realsourceBufferLength:"+realsourceBufferLength);
+						
+						if(bodyLength<=0||bodyLength>=20){
 							System.out.println("bad bodylength!");
 							return ctx.getStopAction();
 						}
 						
 						// The complete message length
-						final int completeMessageLength = HEADER_SIZE + bodyLength;
+//						final int completeMessageLength = HEADER_SIZE + bodyLength;
 
 						// If the source message doesn't contain entire body
-						if (sourceBufferLength < completeMessageLength) {
+						if (realsourceBufferLength < bodyLength) {
 							// stop the filterchain processing and store sourceBuffer to be
 							// used next time
 							int oldposition=sourceBuffer.position()-7;
@@ -65,8 +71,14 @@ public class CToJavaMessageFilter extends BaseFilter {
 
 						// Check if the source buffer has more than 1 complete GIOP message
 						// If yes - split up the first message and the remainder
-						final Buffer remainder = sourceBufferLength > completeMessageLength ? sourceBuffer
-								.split(completeMessageLength) : null;
+//						Buffer remainder = realsourceBufferLength> bodyLength ? sourceBuffer
+//								.split(bodyLength) : null;
+						Buffer remainder;
+						if(realsourceBufferLength>bodyLength){
+							remainder=sourceBuffer.split(sourceBuffer.position()+bodyLength);
+						}else{
+							remainder=null;
+						}
 
 						// Construct a CToJavaMessage message
 						final CToJavaMessage cToJavaMessage = new CToJavaMessage();
@@ -79,7 +91,7 @@ public class CToJavaMessageFilter extends BaseFilter {
 						cToJavaMessage.setBodyLength(bodyLength);
 
 						// Read body
-						final byte[] body = new byte[bodyLength];
+						byte[] body = new byte[bodyLength];
 						
 						sourceBuffer.get(body);
 						// Set body

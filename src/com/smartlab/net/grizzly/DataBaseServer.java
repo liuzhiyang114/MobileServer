@@ -48,7 +48,7 @@ public class DataBaseServer {
         try {
             // binding transport to start listen on certain host and port
 
-            transport.bind("localhost", 7776);// IP为实验室的局域网IP
+            transport.bind("192.168.1.109", 7776);// IP为实验室的局域网IP
 
 
             // start the transport
@@ -117,7 +117,7 @@ class ServerForZigBee extends Thread{
 		
 		try {
 		    // binding transport to start listen on certain host and port
-		    transport.bind("localhost", 8000);
+		    transport.bind("192.168.1.109", 8000);
 
 		    // start the transport
 		    transport.start();
