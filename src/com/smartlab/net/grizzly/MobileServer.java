@@ -81,7 +81,7 @@ public class MobileServer {
 	        
 	        try {
 	            // binding transport to start listen on certain host and port
-	            transport.bind("localhost", 7777);
+	            transport.bind("192.168.1.109", 7777);
 
 	            // start the transport
 	            transport.start();
@@ -162,7 +162,7 @@ class ConnectToDBServer extends Thread{
             transport.start();
 
             // perform async. connect to the server
-            Future<Connection> future = transport.connect("localhost",
+            Future<Connection> future = transport.connect("192.168.1.109",
                     7776);
             // wait for connect operation to complete
             _connection = future.get(10, TimeUnit.SECONDS);
