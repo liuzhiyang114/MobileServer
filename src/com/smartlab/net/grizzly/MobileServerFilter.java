@@ -81,13 +81,11 @@ public class MobileServerFilter extends BaseFilter {
 						SMARTMessage rcvMessage = resultMessageFuture.get(5,
 								TimeUnit.SECONDS);
 
-						System.out.println("MS to MB(pro1):{�����ֻ������"
+						System.out.println("MS to MB(pro1):"
 								+ new String(rcvMessage.getBody(), "UTF-8"));
 
 						// test
-						String newBody2 = "MStoMB:{�����ֻ������"
-								+ new String(rcvMessage.getBody(), "UTF-8")
-								+ "}";
+						String newBody2 = new String(rcvMessage.getBody(), "UTF-8");
 						byte[] newBytes2 = newBody2.getBytes("UTF-8");
 						msg.setBody(newBytes2);
 

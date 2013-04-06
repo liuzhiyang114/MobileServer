@@ -61,7 +61,7 @@ public class DataBaseServerFilter extends BaseFilter {
 						msg = new String(message.getBody(), "UTF-8");
 						
 						// test
-	            		msg = "DBtoMS:{&我是数据库服务器&" + msg + "}";
+	            		msg = "DBtoMS:{" + msg + "}";
 	            		// System.out.println(msg);
 	            		message.setBody(msg.getBytes("UTF-8"));
 

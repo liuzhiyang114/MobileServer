@@ -162,7 +162,7 @@ class ConnectToDBServer extends Thread{
             transport.start();
 
             // perform async. connect to the server
-            Future<Connection> future = transport.connect("192.168.1.109",
+            Future<Connection> future = transport.connect("192.168.1.108",
                     7776);
             // wait for connect operation to complete
             _connection = future.get(10, TimeUnit.SECONDS);
