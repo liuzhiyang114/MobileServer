@@ -247,23 +247,23 @@ class ServerForDBFilter extends BaseFilter{
 		System.out.println("exceptionOccurred");
 	}
 
-	@Override
-	public NextAction handleClose(final FilterChainContext ctx) throws IOException {
-		// TODO Auto-generated method stub
-		
-		System.out.println("handleClose");
-//		scheduler.schedule(new Runnable() {
-//
-//			@Override
-//			public void run() {
-//				(TCPNIOTransport)(ctx.getConnection().getTransport());
-//				
-//			}
-//			
-//		}, 10, TimeUnit.MILLISECONDS);
-		System.in.close();
-		return super.handleClose(ctx);
-	}
+//	@Override
+//	public NextAction handleClose(final FilterChainContext ctx) throws IOException {
+//		// TODO Auto-generated method stub
+//		
+//		System.out.println("handleClose");
+////		scheduler.schedule(new Runnable() {
+////
+////			@Override
+////			public void run() {
+////				(TCPNIOTransport)(ctx.getConnection().getTransport());
+////				
+////			}
+////			
+////		}, 10, TimeUnit.MILLISECONDS);
+////		System.in.close();
+//		return super.handleClose(ctx);
+//	}
 	
 	
 	
